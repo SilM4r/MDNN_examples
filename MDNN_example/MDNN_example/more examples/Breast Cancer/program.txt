@@ -1,0 +1,105 @@
+using Microsoft.VisualBasic.FileIO;
+using My_DNN.Activation_functions;
+using My_DNN.Layers;
+using My_DNN.Loss_functions;
+using My_DNN.Optimizers;
+
+
+namespace My_DNN
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+
+
+            List<string[]> data = new List<string[]>();
+            List<string[]> rawData = new List<string[]>();
+            List<double[]> dataX = new List<double[]>();
+            List<double[]> dataY = new List<double[]>();
+
+            Random rng = new Random();
+
+
+            using (TextFieldParser parser = new TextFieldParser(@"data.csv"))
+            {
+                parser.TextFieldType = FieldType.Delimited;
+                parser.SetDelimiters(",");
+                while (!parser.EndOfData)
+                {
+                    //Processing row
+                    rawData.Add(parser.ReadFields());
+                }
+            }
+
+            rawData = rawData.Skip(1).ToList();
+
+            data = rawData.OrderBy(x => rng.Next()).ToList();
+
+            for (int i = 0; i < data.Count(); i++)
+            {
+                string[] value = data[i];
+
+                dataX.Add(new double[] {   double.Parse(value[2], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[3], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[4], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[5], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[6], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[7], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[8], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[9], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[10], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[11], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[12], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[13], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[14], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[15], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[16], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[17], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[18], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[19], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[20], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[21], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[22], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[23], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[24], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[25], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[26], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[27], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[28], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[29], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[30], System.Globalization.CultureInfo.InvariantCulture),
+                                           double.Parse(value[31], System.Globalization.CultureInfo.InvariantCulture),
+                });
+
+                double[] curretOutput = new double[2];
+
+                switch (value[1])
+                {
+                    case "M":
+                        curretOutput[0] = 1;
+                        curretOutput[1] = 0;
+                        break;
+                    case "B":
+                        curretOutput[0] = 0;
+                        curretOutput[1] = 1;
+                        break;
+                }
+
+                dataY.Add(curretOutput);
+            }
+
+            MDNN model = new MDNN(new Dense(2, new Softmax()), new Adam(0.0001), new CrossEntropy());
+
+            model.Layers.Add(new Dense(76));
+
+
+            Tensor inputT = new Tensor(Tensor.ConvertJaggedToMulti(dataX.ToArray()));
+            Tensor outputT = new Tensor(Tensor.ConvertJaggedToMulti(dataY.ToArray()));
+
+            model.Train.TrainLoop(inputT, outputT, 50_000, 8);
+
+        }
+
+    }
+}

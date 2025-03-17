@@ -1,0 +1,35 @@
+{
+  "Note": "",
+  "Valid_Loss": 4.792534548744377E-09,
+  "Schema": "[Rnn]",
+  "Current_epoch": 858801,
+  "Target_epoch": 2260000,
+  "Mini_batch": 1,
+  "Loss_functions": "MSE",
+  "Optimizer": {
+    "Name": "Adam",
+    "Hyperparameters": [
+      1E-05,
+      0.9,
+      0.999
+    ]
+  },
+  "Layers": [
+    {
+      "Name_of_activation_function": "ReLu",
+      "Neurons": [
+        {
+          "Weights": [
+            0.1179495559521259,
+            0.016075306780254196,
+            0.19202133471555172,
+            0.22934400218400613,
+            6.455391281959948E-05
+          ],
+          "Bias": -0.09449739929491911
+        }
+      ],
+      "LayerType": "RNN"
+    }
+  ]
+}

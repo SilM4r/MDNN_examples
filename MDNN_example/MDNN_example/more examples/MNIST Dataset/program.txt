@@ -1,0 +1,234 @@
+using Microsoft.VisualBasic.FileIO;
+using My_DNN.Activation_functions;
+using My_DNN.Layers;
+using My_DNN.Layers.classes;
+using My_DNN.Loss_functions;
+using My_DNN.Optimizers;
+
+
+namespace My_DNN
+{
+    internal class Program
+    {
+        static async Task Main(string[] args)
+        {
+
+
+            List<string[]> data = new List<string[]>();
+            List<string[]> dataTrain = new List<string[]>();
+
+            List<double[]> dataX = new List<double[]>();
+            List<double[]> dataY = new List<double[]>();
+            List<double[]> dataXTrain = new List<double[]>();
+            List<double[]> dataYTrain = new List<double[]>();
+
+            Random rng = new Random();
+
+            Console.WriteLine("loading dataset from disk to ram...");
+
+
+            using (TextFieldParser parser = new TextFieldParser(@"mnist_train.csv"))
+            {
+                parser.TextFieldType = FieldType.Delimited;
+                parser.SetDelimiters(",");
+                while (!parser.EndOfData)
+                {
+                    //Processing row
+                    data.Add(parser.ReadFields());
+                }
+            }
+            /*
+            using (TextFieldParser parser = new TextFieldParser(@"data.csv"))
+            {
+                parser.TextFieldType = FieldType.Delimited;
+                parser.SetDelimiters(",");
+                while (!parser.EndOfData)
+                {
+                    //Processing row
+                    dataTrain.Add(parser.ReadFields());
+                }
+            }
+            */
+
+            Console.WriteLine("loading dataset from disk to ram... done");
+            Console.WriteLine("Convert data to dataset and spliting to input and target output data...");
+
+            for (int i = 0; i < data.Count(); i++)
+            {
+                string[] value = data[i];
+
+                double[] arrDouble = new double[value.Length - 1];
+
+                for (int j = 1; j < value.Length - 1; j++)
+                {
+                    arrDouble[j] = Convert.ToDouble(value[j]);
+                }
+
+                dataX.Add(arrDouble);
+
+                double[] curretOutput = new double[10];
+
+                switch (value[0])
+                {
+                    case "0":
+                        curretOutput[0] = 1;
+                        curretOutput[1] = 0;
+                        curretOutput[2] = 0;
+                        curretOutput[3] = 0;
+                        curretOutput[4] = 0;
+                        curretOutput[5] = 0;
+                        curretOutput[6] = 0;
+                        curretOutput[7] = 0;
+                        curretOutput[8] = 0;
+                        curretOutput[9] = 0;
+                        break;
+                    case "1":
+                        curretOutput[0] = 0;
+                        curretOutput[1] = 1;
+                        curretOutput[2] = 0;
+                        curretOutput[3] = 0;
+                        curretOutput[4] = 0;
+                        curretOutput[5] = 0;
+                        curretOutput[6] = 0;
+                        curretOutput[7] = 0;
+                        curretOutput[8] = 0;
+                        curretOutput[9] = 0;
+                        break;
+                    case "2":
+                        curretOutput[0] = 0;
+                        curretOutput[1] = 0;
+                        curretOutput[2] = 1;
+                        curretOutput[3] = 0;
+                        curretOutput[4] = 0;
+                        curretOutput[5] = 0;
+                        curretOutput[6] = 0;
+                        curretOutput[7] = 0;
+                        curretOutput[8] = 0;
+                        curretOutput[9] = 0;
+                        break;
+                    case "3":
+                        curretOutput[0] = 0;
+                        curretOutput[1] = 0;
+                        curretOutput[2] = 0;
+                        curretOutput[3] = 1;
+                        curretOutput[4] = 0;
+                        curretOutput[5] = 0;
+                        curretOutput[6] = 0;
+                        curretOutput[7] = 0;
+                        curretOutput[8] = 0;
+                        curretOutput[9] = 0;
+                        break;
+                    case "4":
+                        curretOutput[0] = 0;
+                        curretOutput[1] = 0;
+                        curretOutput[2] = 0;
+                        curretOutput[3] = 0;
+                        curretOutput[4] = 1;
+                        curretOutput[5] = 0;
+                        curretOutput[6] = 0;
+                        curretOutput[7] = 0;
+                        curretOutput[8] = 0;
+                        curretOutput[9] = 0;
+                        break;
+                    case "5":
+                        curretOutput[0] = 0;
+                        curretOutput[1] = 0;
+                        curretOutput[2] = 0;
+                        curretOutput[3] = 0;
+                        curretOutput[4] = 0;
+                        curretOutput[5] = 1;
+                        curretOutput[6] = 0;
+                        curretOutput[7] = 0;
+                        curretOutput[8] = 0;
+                        curretOutput[9] = 0;
+                        break;
+                    case "6":
+                        curretOutput[0] = 0;
+                        curretOutput[1] = 0;
+                        curretOutput[2] = 0;
+                        curretOutput[3] = 0;
+                        curretOutput[4] = 0;
+                        curretOutput[5] = 0;
+                        curretOutput[6] = 1;
+                        curretOutput[7] = 0;
+                        curretOutput[8] = 0;
+                        curretOutput[9] = 0;
+                        break;
+                    case "7":
+                        curretOutput[0] = 0;
+                        curretOutput[1] = 0;
+                        curretOutput[2] = 0;
+                        curretOutput[3] = 0;
+                        curretOutput[4] = 0;
+                        curretOutput[5] = 0;
+                        curretOutput[6] = 0;
+                        curretOutput[7] = 1;
+                        curretOutput[8] = 0;
+                        curretOutput[9] = 0;
+                        break;
+                    case "8":
+                        curretOutput[0] = 0;
+                        curretOutput[1] = 0;
+                        curretOutput[2] = 0;
+                        curretOutput[3] = 0;
+                        curretOutput[4] = 0;
+                        curretOutput[5] = 0;
+                        curretOutput[6] = 0;
+                        curretOutput[7] = 0;
+                        curretOutput[8] = 1;
+                        curretOutput[9] = 0;
+                        break;
+                    case "9":
+                        curretOutput[0] = 0;
+                        curretOutput[1] = 0;
+                        curretOutput[2] = 0;
+                        curretOutput[3] = 0;
+                        curretOutput[4] = 0;
+                        curretOutput[5] = 0;
+                        curretOutput[6] = 0;
+                        curretOutput[7] = 0;
+                        curretOutput[8] = 0;
+                        curretOutput[9] = 1;
+                        break;
+
+                }
+
+                dataY.Add(curretOutput);
+            }
+
+            data = new List<string[]>();
+
+            //MDNN model = MDNN.LoadModel("AutoSave.json");
+
+
+            //GeneralNeuralNetworkSettings.calculationViaGpu = true;
+
+            Console.WriteLine("Convert data to dataset and spliting to input and target output data... done");
+            Console.WriteLine("Creating model...");
+
+            Layer outputLayer = new Dense(10, new Softmax());
+
+            MDNN model = new MDNN(outputLayer, new Adam(0.0001), new CrossEntropy());
+            model.Layers.Add(new Dense(32, new Leak_ReLu()));
+
+            model.info();
+
+
+
+            model.Train.Number_of_skip_frist_Epoch_in_plotter = 0;
+            model.Train.Number_Of_Show_Epoch_In_Console = 100;
+
+            Console.WriteLine("Creating model... done");
+            Console.WriteLine("Train... ");
+
+            //model.Train.TestNeuralNetwork(dataX.ToArray(), dataY.ToArray());
+            await model.Train.TrainLoopAsync(new Tensor(Tensor.ConvertJaggedToMulti(dataX.ToArray())), new Tensor(Tensor.ConvertJaggedToMulti( dataY.ToArray())), 10000, 10);
+
+            Console.WriteLine("Train... done ");
+
+            //model.SaveAsJson("MNIST2");
+
+        }
+
+    }
+}

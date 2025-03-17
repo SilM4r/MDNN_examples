@@ -1,0 +1,50 @@
+{
+  "Note": "",
+  "Valid_Loss": 764.0159067846631,
+  "Schema": "[Dense,Dense]",
+  "Current_epoch": 437431,
+  "Target_epoch": 500000,
+  "Mini_batch": 32,
+  "Loss_functions": "MSE",
+  "Optimizer": {
+    "Name": "Adam",
+    "Hyperparameters": [
+      0.001,
+      0.9,
+      0.999
+    ]
+  },
+  "Layers": [
+    {
+      "Name_of_activation_function": "ReLu",
+      "Neurons": [
+        {
+          "Weights": [
+            0.02088573668736296
+          ],
+          "Bias": 0.3954787927795291
+        },
+        {
+          "Weights": [
+            -0.0007528402490885387
+          ],
+          "Bias": 0.5430975547460607
+        }
+      ],
+      "LayerType": "Dense"
+    },
+    {
+      "Name_of_activation_function": "ReLu",
+      "Neurons": [
+        {
+          "Weights": [
+            11.682098611399548,
+            10.577356793008084
+          ],
+          "Bias": 12.88566330352764
+        }
+      ],
+      "LayerType": "Dense"
+    }
+  ]
+}

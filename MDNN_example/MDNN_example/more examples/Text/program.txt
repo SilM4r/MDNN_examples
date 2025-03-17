@@ -1,0 +1,119 @@
+using My_DNN.Activation_functions;
+using My_DNN.Layers;
+using My_DNN.Loss_functions;
+using My_DNN.Optimizers;
+using ScottPlot.MultiplotLayouts;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+
+
+namespace My_DNN
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Random rnd = new Random();
+
+
+
+            double[][] data = { new double[] { 1, 9, 21, 77, 0, 0 },
+                               new double[] { 2, 11, 23, 77, 0, 0 },
+                               new double[] { 4, 17, 70, 26, 77, 0 },
+                               new double[] { 5, 13, 44, 24, 77, 0 },
+                               new double[] { 7, 14, 18, 71, 77, 0 },
+                               new double[] { 35, 13, 41, 25, 76, 0 },
+                               new double[] { 3, 9, 27, 77,0,0},
+                               new double[] { 34, 55, 65, 24, 76, 0},
+                               new double[] { 1, 12, 22, 40, 24, 77},
+                               new double[] { 7, 15, 42, 19, 77, 0},
+                               new double[] { 2, 75, 13, 44, 24, 77},
+                               new double[] { 5, 16, 63, 27, 77, 0},
+                               new double[] { 32,13, 41, 20, 77, 0},
+                               new double[] { 3, 11, 19, 43, 24, 77},
+                               new double[]  { 39, 9, 64, 25, 76,0},
+                               new double[] { 31, 69, 28, 77,0,0},
+                               new double[] { 7, 9, 59, 65, 22, 77},
+                               new double[] { 56, 26, 8, 70, 77,0},
+                               new double[] { 3,18,52,8,29,77},
+                               new double[] { 53,1,13,2,11,77},
+                               new double[] { 19,14,18,77,0,0},
+                               new double[] { 73,3,8,22,77,0},
+                               new double[] { 8,3,22,76,0,0},
+                               new double[] { 22,16,42,21,77,0},
+                               new double[] { 22,51,21,76,0,0},
+                               new double[] { 1,14,11,21,77,0},
+                               new double[] { 2,8,75,42,22,77},
+                               new double[] { 3,31,15,42,19,77},
+                               new double[] { 4,33,12,21,77,0},
+                               new double[] { 7,14,13,72,77,0},
+                               new double[] { 19,17,26,77,0,0},
+                               new double[] { 21,17,77,0,0,0},
+                               new double[] { 21,18,40,25,77,0},
+                               new double[] { 22,13,47,25,77,0},
+                               new double[] { 33,11,60,21,77,0},
+                               new double[] { 35,13,44,24,77,0},
+                               new double[] { 36,6,10,31,76,0},
+                               new double[] { 41,23,8,21,77,0},
+                               new double[]  { 39, 9, 64, 25, 76,0},
+                               new double[] { 31, 69, 28, 77,0,0},
+                               new double[] { 7, 9, 59, 65, 22, 77},
+                               new double[] { 56, 26, 8, 70, 77,0},
+                               new double[] { 3,18,52,8,29,77},
+                               new double[] { 53,1,13,2,11,77},
+                               new double[] { 19,14,18,77,0,0},
+                               new double[] { 73,3,8,22,77,0},
+                               new double[] { 8,3,22,76,0,0},
+                               new double[] { 22,16,42,21,77,0},
+                               new double[] { 22,51,21,76,0,0},
+                               new double[] { 1,14,11,21,77,0},
+                               new double[] { 2,8,75,42,22,77},
+                               new double[] { 3,31,15,42,19,77},
+                               new double[] { 4,33,12,21,77,0},
+                               new double[] { 7,14,13,72,77,0},
+                               new double[] { 19,17,26,77,0,0},
+                               new double[] { 21,17,77,0,0,0},
+                               new double[] { 21,18,40,25,77,0},
+                               new double[] { 22,13,47,25,77,0},
+                               new double[] { 33,11,60,21,77,0},
+                               new double[] { 35,13,44,24,77,0},
+                               new double[] { 36,6,10,31,76,0},
+                               new double[] { 41,23,8,21,77,0},
+                new double[] { 5,14,16,27,77,0},
+                new double[] { 35,3,14,17,26,76},};
+
+            int rows = data.Count();
+
+            double[][] dataX = new double[rows][];
+            double[][] dataY = new double[rows][];
+
+            for (int i = 0; i < rows; i++)
+            {
+                dataX[i] = new double[5];
+                dataY[i] = new double[5];
+            }
+
+
+            for (int i = 0; i < data.Count(); i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    dataX[i][j] = data[i][j];
+                    dataY[i][j] = data[i][j + 1];
+                }
+            }
+
+            MDNN model = new MDNN(new Dense(1, new ReLu()), new Adam(0.001), new MSE());
+
+            model.Layers.Add(new Dense(2));
+
+            Tensor inputT = new Tensor(Tensor.ConvertJaggedToMulti(dataX));
+            Tensor outputT = new Tensor(Tensor.ConvertJaggedToMulti(dataY));
+            model.Train.Number_Of_Show_Epoch_In_Console = 120;
+
+            model.Train.TrainLoop(inputT, outputT, 500000, 32, true);
+
+        }
+
+
+    }
+}

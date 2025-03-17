@@ -1,0 +1,1 @@
+source: https://cs.wikipedia.org/wiki/Fibonacciho_posloupnost

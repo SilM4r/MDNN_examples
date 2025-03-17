@@ -1,0 +1,94 @@
+using Microsoft.VisualBasic.FileIO;
+using My_DNN.Activation_functions;
+using My_DNN.Layers;
+using My_DNN.Layers.classes;
+using My_DNN.Loss_functions;
+using My_DNN.Optimizers;
+
+
+namespace My_DNN
+{
+    internal class Program
+    {
+
+        static void Main(string[] args)
+        {
+
+            double[][][] dataX;
+            double[][][] dataY;
+
+
+            Random rng = new Random();
+
+            Console.WriteLine("loading dataset from disk to ram...");
+
+            double[][][] data = {
+                new double[][] { new double[] {0},new double[] {1},new double[] {1},new double[] {2},new double[] {3} },
+                new double[][] { new double[] {5},new double[] {8},new double[] {13},new double[] {21},new double[] {34}},
+                new double[][] { new double[] {55},new double[] {89},new double[] {144},new double[] {233},new double[] {377}},
+                new double[][] { new double[] {610},new double[] {987},new double[] {1597},new double[] {2584},new double[] {4181}},
+                new double[][] { new double[] {2},new double[] {3},new double[] {5},new double[] {8},new double[] {13}},
+                new double[][] { new double[] {21},new double[] {34},new double[] {55},new double[] {89},new double[] {144}},
+                new double[][] { new double[] {233},new double[] {377},new double[] {610},new double[] {987},new double[] {1597}},
+            };
+
+            int rows = data.Count();
+            int cols = data[0].Count() - 1;
+
+            dataX = new double[rows][][];
+            dataY = new double[rows][][];
+
+            for (int i = 0; i < rows; i++)
+            {
+                dataX[i] = new double[cols][];
+                dataY[i] = new double[cols][];
+                for (int j = 0; j < cols; j++)
+                {
+                    dataX[i][j] = new double[data[i][j].Count()];
+                    dataY[i][j] = new double[data[i][j].Count()];
+                }
+            }
+
+
+            for (int i = 0; i < data.Count(); i++)
+            {
+                for (int j = 0; j < (data[i].Count() - 1); j++)
+                {
+                    dataX[i][j] = data[i][j];
+                    dataY[i][j] = data[i][j + 1];
+                }
+            }
+
+
+
+            //MDNN model = MDNN.LoadModel("AutoSave.json");
+
+
+            //GeneralNeuralNetworkSettings.calculationViaGpu = true;
+
+            Console.WriteLine("Convert data to dataset and splitting to input and target output data... done");
+            Console.WriteLine("Creating model...");
+
+            Layer outputLayer = new RNN(1, new ReLu());
+
+            MDNN model = new MDNN(outputLayer, new Adam(0.00001), new MSE());
+
+            model.info();
+
+            model.Train.Number_of_skip_frist_Epoch_in_plotter = 0;
+            model.Train.Number_Of_Show_Epoch_In_Console = 100;
+
+            Console.WriteLine("Creating model... done");
+            Console.WriteLine("Train... ");
+
+            //model.Train.TestNeuralNetwork(dataX.ToArray(), dataY.ToArray());
+            model.Train.TrainLoop(new Tensor(Tensor.ConvertJaggedToMulti(dataX)), new Tensor(Tensor.ConvertJaggedToMulti(dataY)), 2260000, 1, false);
+
+            Console.WriteLine("Train... done ");
+
+            //model.SaveAsJson("MNIST2");
+
+        }
+
+    }
+}

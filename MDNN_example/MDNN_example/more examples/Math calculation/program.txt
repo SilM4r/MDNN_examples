@@ -1,0 +1,96 @@
+using Microsoft.VisualBasic.FileIO;
+using My_DNN.Activation_functions;
+using My_DNN.Layers;
+using My_DNN.Loss_functions;
+using My_DNN.Optimizers;
+using System;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+
+
+namespace My_DNN
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            int totalEpoch = 90000;
+            int size_of_mini_batch = 5;
+            int maxValue = 10;
+
+            Random rnd = new Random();
+
+            //GeneralNeuralNetworkSettings.calculationViaGpu = true;
+
+            MDNN model = new MDNN(new Dense(1, new Linear()), new Adam(0.001), new MSE());
+            model.Layers.Add(new Dense(32, new Leak_ReLu()));
+            model.Layers.Add(new Dense(32, new Leak_ReLu()));
+            model.Layers.Add(new Dense(32, new Leak_ReLu()));
+            model.Layers.Add(new Dense(32, new Leak_ReLu()));
+
+            model.Train.Total_epoch = (uint)totalEpoch;
+            model.Train.Mini_batch = (uint)size_of_mini_batch;
+
+
+            model.info();
+
+            for (int epoch = 0; epoch < totalEpoch; epoch++)
+            {
+                for (uint miniBatch = 0; miniBatch < size_of_mini_batch; miniBatch++)
+                {
+                    int num1 = rnd.Next(maxValue);
+                    int num2 = rnd.Next(maxValue);
+
+                    model.Train.Fit(new Tensor(new double[] { num1, num2 }), new Tensor (new double[] { num1 * num2 }));
+                }
+
+                model.Train.UpdateParams();
+
+                if (epoch % 100 == 0)
+                {
+                    double loss = GeneralNeuralNetworkSettings.loss_func.GetAverageLossPerIteration();
+                    if (loss is double.NaN || loss is double.PositiveInfinity)
+                    {
+                        Console.WriteLine("Error: Nan number or infinity number");
+                        return;
+                    }
+
+                    ConsoleControler.ShowEpochInfo(model);
+                }
+            }
+
+            Console.WriteLine(control(model));
+            Console.WriteLine("Total variable = " + maxValue * maxValue);
+
+            model.SaveAsJson("computinTest");
+
+            while (true)
+            {
+                int num1 = int.Parse(Console.ReadLine());
+                int num2 = int.Parse(Console.ReadLine());
+                Console.WriteLine(model.GetResults(new Tensor(new double[] { num1, num2 })).Data[0]);
+            }
+
+            int control(MDNN model)
+            {
+                int score = 0;
+
+                for (int i = 0; i < maxValue; i++)
+                {
+                    for (int j = 0; j < maxValue; j++)
+                    {
+                        double[] z = model.GetResults(new Tensor(new double[] { i, j })).Data;
+
+                        if (Math.Round(z[0]) == i * j)
+                        {
+                            score++;
+                        }
+                    }
+
+                }
+
+                return score;
+            }
+        }
+
+    }
+}
