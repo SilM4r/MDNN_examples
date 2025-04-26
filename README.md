@@ -1,26 +1,26 @@
-## 📂 Struktura ukázkových programů
+## 📂 Structure of Sample Programs
 
-Tento adresář obsahuje sadu demonstračních příkladů, které využívají knihovnu **MDNN** pro vytvoření a trénování a neuronových sítí. Každý příklad je navržen tak, aby ukázal konkrétní funkcionalitu nebo konfiguraci modelu.
+This directory contains a set of demonstration examples that use the **MDNN** library for creating and training neural networks. Each example is designed to showcase a specific functionality or model configuration.
 
-### 🖥️ Spuštění ukázek
+### 🖥️ Running the Samples
 
-Ukázkové aplikace jsou připraveny k okamžitému spuštění ve vývojovém prostředí **Visual Studio**. Po zkopírování příslušného kódu do existujícího projektu stačí projekt přeložit a spustit.
+The sample applications are ready to be run immediately within the **Visual Studio** development environment. After copying the relevant code into an existing project, simply build and run the project.
 
-### 📁 Obsah jednotlivých složek
+### 📁 Contents of Each Folder
 
-Každá složka obsahuje následující soubory:
+Each folder contains the following files:
 
-- **`program.txt`** – zdrojový kód programu, který demonstruje použití knihovny MDNN. Tento kód stačí zkopírovat do hlavního souboru (`Program.cs`) v rámci již vytvořeného projektu.
-- **`.json` soubor** – serializovaný model neuronové sítě natrénovaný na daném datasetu. Model je připraven k okamžité inference bez nutnosti opětovného trénování.
-- **`dataset.csv`** *(nebo jiný formát)* – datová sada použitá pro trénování modelu.
-- **`loss_plot.png`** – vizualizace průběhu hodnoty ztrátové funkce napříč jednotlivými epochami trénování.
+- **`program.txt`** – the source code demonstrating the use of the MDNN library. Simply copy this code into the main file (`Program.cs`) of your existing project.
+- **`.json` file** – a serialized neural network model trained on the given dataset. The model is ready for immediate inference without the need for retraining.
+- **`dataset.csv`** *(or other format)* – the dataset used for training the model.
+- **`loss_plot.png`** – a visualization of the loss function value over the training epochs.
 
-### ✅ Doporučený postup
+### ✅ Recommended Workflow
 
-1. Vytvoř nový C# projekt ve Visual Studiu.
-2. Načti knihovnu **MDNN.dll** a přidej potřebné odkazy.
-3. Zkopíruj kód z `program.txt` do souboru `Program.cs`.
-4. Ujisti se, že případný dataset se nachází ve správném adresáři projektu.
-5. Spusť aplikaci.
+1. Create a new C# project in Visual Studio.
+2. Load the **MDNN.dll** library and add the necessary references.
+3. Copy the code from `program.txt` into the `Program.cs` file.
+4. Make sure the dataset is placed in the correct project directory if needed.
+5. Run the application.
 
-Tímto způsobem můžeš snadno testovat a upravovat jednotlivé scénáře použití knihovny **MDNN** podle svých potřeb.
+This way, you can easily test and modify different usage scenarios of the **MDNN** library according to your needs.
