@@ -1,11 +1,9 @@
-﻿using My_DNN.Layers;
-using My_DNN.Layers.classes;
-using My_DNN.Optimizers;
-using My_DNN;
+﻿using My_DNN;
 using My_DNN.Activation_functions;
-using System.Xml.Schema;
-using ScottPlot;
+using My_DNN.Layers;
+using My_DNN.Layers.classes;
 using My_DNN.Loss_functions;
+using My_DNN.Optimizers;
 
 namespace MDNN_example
 {
@@ -13,7 +11,9 @@ namespace MDNN_example
     {
         static void Main(string[] args)
         {
-            //The goal is to train a neural network that will always have an output if the middle bit is 1. The test data are 010 where the output must be 1.
+            // Úloha: naučit síť, že výstup je 1 právě když je prostřední bit 1.
+            // Kombinace 0,1,0 se schválně NEUČÍ — na ní se na konci ověří, jestli
+            // se síť naučila pravidlo, nebo jen odříkává trénovací data.
 
             double[][] inputsDataset = new double[][] { new double[] { 0, 0, 0},
                                                         new double[] { 0, 0, 1},
@@ -36,15 +36,26 @@ namespace MDNN_example
             Optimizer optimizer = new SGD(0.01);
             Loss loss = new MSE();
 
+            // POZOR na význam: epocha = jeden PLNÝ průchod trénovacím setem, ne jeden krok
+            // optimizeru. Na epochu tedy připadá tolik kroků, kolik je dávek.
+            // Počet kroků najdeš v model.Train.OptimizerSteps.
             uint epoch = 1000;
 
-            MDNN model = new MDNN(outputLayer, optimizer, loss);
+            // seed = reprodukovatelnost: stejný běh dvakrát dá stejný výsledek
+            MDNN model = new MDNN(outputLayer, optimizer, loss, seed: 42);
 
-            Tensor tensorInputDataset = new Tensor(Tensor.ConvertJaggedToMulti(inputsDataset));
-            Tensor tensorOutputDataset = new Tensor(Tensor.ConvertJaggedToMulti(ouputDataset));
+            // TrainLoop si dataset sám zamíchá a rozdělí na train / valid / test
+            // v poměru 0.7 / 0.15 / 0.15.
+            model.Train.TrainLoop(inputsDataset, ouputDataset, epoch, 1);
 
-            model.Train.TrainLoop(tensorInputDataset, tensorOutputDataset, epoch,1);
+            // Vlastní pointa příkladu: vyzkoušet kombinaci, kterou síť při tréninku neviděla.
+            double[] unseen = { 0, 1, 0 };
+            double prediction = model.GetResults(new Tensor(unseen)).Data[0];
 
+            Console.WriteLine();
+            Console.WriteLine($"Vstup 0,1,0 (při tréninku nebyl) -> {prediction:F4}, zaokrouhleno {Math.Round(prediction)}");
+            Console.WriteLine("Očekáváme 1, protože prostřední bit je 1.");
+            Console.WriteLine($"Epoch: {model.Train.CurrentEpoch}, kroků optimizeru: {model.Train.OptimizerSteps}");
         }
     }
 }

@@ -8,13 +8,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ScottPlot" Version="5.0.54" />
-  </ItemGroup>
+    <!--
+      Odkaz na knihovnu předpokládá, že repozitáře MDNN a MDNN_examples jsou naklonované
+      VEDLE SEBE ve stejné složce:
 
-  <ItemGroup>
-    <Reference Include="MDNN">
-      <HintPath>C:\Users\Martin\source\repos\MDNN\MDNN\MDNN\bin\Debug\net9.0\MDNN.dll</HintPath>
-    </Reference>
+          ...
+           ├── MDNN
+           └── MDNN_examples     <- tenhle repozitář
+
+      Dřív tu byl absolutní HintPath na C:\Users\Martin\source\repos\... , takže projekt
+      nešel přeložit nikde jinde než na jednom konkrétním Windows stroji. ProjectReference
+      navíc knihovnu vždycky přestaví, takže se netestuje proti zastaralé DLL.
+
+      Když máš MDNN jinde, uprav cestu (nebo použij Reference + HintPath na svoji MDNN.dll).
+    -->
+    <ProjectReference Include="../../../MDNN/MDNN/MDNN/MDNN/MDNN.csproj" />
   </ItemGroup>
 
 </Project>

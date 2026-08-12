@@ -1,0 +1,15 @@
+# Výstupy buildu. Dřív byla složka obj/ commitnutá v repu, což znamenalo:
+#  - šum v každém diffu (build přepsal 18 souborů, aniž se změnil zdroják)
+#  - absolutní cesty konkrétního stroje v project.assets.json
+#    (E:\informatika\..., C:\Users\Martin\.nuget\...)
+bin/
+obj/
+
+# soubory, které si knihovna zapisuje do pracovního adresáře za běhu
+loss.png
+AutoSave.json
+
+.vs/
+.idea/
+.DS_Store
+*.user
