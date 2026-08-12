@@ -1,0 +1,98 @@
+using Microsoft.VisualBasic.FileIO;
+using My_DNN.Activation_functions;
+using My_DNN.Layers;
+using My_DNN.Loss_functions;
+using My_DNN.Optimizers;
+
+namespace My_DNN
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            // Klasifikace kosatců do tří druhů podle čtyř rozměrů květu.
+            // Dataset: Iris.csv, 150 řádků ve tvaru
+            //     id, sepal_length, sepal_width, petal_length, petal_width, druh
+            // (bez hlavičky, desetinná tečka).
+
+            List<string[]> rawData = new List<string[]>();
+            List<double[]> dataX = new List<double[]>();
+            List<double[]> dataY = new List<double[]>();
+
+            Random rng = new Random(42);
+
+            using (TextFieldParser parser = new TextFieldParser(@"Iris.csv"))
+            {
+                parser.TextFieldType = FieldType.Delimited;
+                parser.SetDelimiters(",");
+                while (!parser.EndOfData)
+                {
+                    rawData.Add(parser.ReadFields());
+                }
+            }
+
+            // Zamíchat, protože v souboru jdou druhy za sebou — bez toho by při dělení
+            // na train/valid/test padl celý jeden druh mimo trénovací sadu.
+            List<string[]> data = rawData.OrderBy(x => rng.Next()).ToList();
+
+            foreach (string[] row in data)
+            {
+                // sloupce 1..4 jsou rozměry, sloupec 5 je druh
+                dataX.Add(new double[]
+                {
+                    double.Parse(row[1], System.Globalization.CultureInfo.InvariantCulture),
+                    double.Parse(row[2], System.Globalization.CultureInfo.InvariantCulture),
+                    double.Parse(row[3], System.Globalization.CultureInfo.InvariantCulture),
+                    double.Parse(row[4], System.Globalization.CultureInfo.InvariantCulture),
+                });
+
+                // one-hot: tři výstupní neurony, právě jeden má být 1
+                double[] target = new double[3];
+                switch (row[5])
+                {
+                    case "Iris-setosa":     target[0] = 1; break;
+                    case "Iris-versicolor": target[1] = 1; break;
+                    case "Iris-virginica":  target[2] = 1; break;
+                }
+                dataY.Add(target);
+            }
+
+            // Normalizace na <0,1> podle maxima každého sloupce. U tak malých hodnot
+            // (rozměry v centimetrech) to není nutnost jako u Fibonacciho posloupnosti,
+            // ale učí se to znatelně rychleji.
+            for (int column = 0; column < 4; column++)
+            {
+                double max = dataX.Max(sample => sample[column]);
+                foreach (double[] sample in dataX)
+                {
+                    sample[column] /= max;
+                }
+            }
+
+            // Softmax + CrossEntropy je pro klasifikaci do více tříd správná dvojice:
+            // knihovna je uvnitř spojí do jednoho kroku (gradient vyjde rovnou s - t).
+            // seed = reprodukovatelnost
+            MDNN model = new MDNN(new Dense(3, new Softmax()), new Adam(0.01), new CrossEntropy(), seed: 42);
+            model.Layers.Add(new Dense(16, new Leak_ReLu()));
+
+            model.info();
+
+            // Epocha = jeden PLNÝ průchod trénovacím setem, ne jeden krok optimizeru.
+            // Ze 150 vzorků jde 105 na trénink, takže při dávce 8 je to 14 kroků na epochu.
+            model.Train.TrainLoop(dataX.ToArray(), dataY.ToArray(), 300, 8);
+
+            Console.WriteLine($"Hotovo: {model.Train.CurrentEpoch} epoch, {model.Train.OptimizerSteps} kroků optimizeru.");
+
+            // Zkouška na prvním vzorku: softmax dá pravděpodobnosti tří druhů,
+            // vybere se ten nejpravděpodobnější a porovná se se skutečností.
+            string[] names = { "setosa", "versicolor", "virginica" };
+
+            double[] probabilities = model.GetResults(new Tensor(dataX[0])).Data;
+            int predicted = Array.IndexOf(probabilities, probabilities.Max());
+            int actual = Array.IndexOf(dataY[0], dataY[0].Max());
+
+            Console.WriteLine($"První vzorek -> předpověď {names[predicted]} " +
+                              $"({probabilities[predicted]:P1}), skutečnost {names[actual]}");
+        }
+    }
+}

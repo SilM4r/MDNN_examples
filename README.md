@@ -1,18 +1,34 @@
-## 📂 Examples for the MDNN library
+## 📂 Structure of Sample Programs
 
-Runnable examples that use the [MDNN](https://github.com/SilM4r/MDNN) library for building and
-training neural networks. Each example demonstrates a specific feature or model configuration.
+This directory contains a set of demonstration examples that use the **MDNN** library for creating and training neural networks. Each example is designed to showcase a specific functionality or model configuration.
 
-### 📁 What is here
+### 🖥️ Running the Samples
 
-| Example | Shows |
-|---|---|
-| `MDNN_example` | Binary classification — the output is 1 exactly when the middle bit of the input is 1. Trains on 7 of the 8 possible inputs and then checks the one it never saw. |
+The sample applications are ready to be run immediately within the **Visual Studio** development environment. After copying the relevant code into an existing project, simply build and run the project.
 
-### 🖥️ Building and running
+### 📁 Contents of Each Folder
 
-The example projects reference the library by **relative path** and assume that `MDNN` and
-`MDNN_examples` are cloned **next to each other**:
+Each folder contains the following files:
+
+- **`program.txt`** – the source code demonstrating the use of the MDNN library. Simply copy this code into the main file (`Program.cs`) of your existing project.
+- **`.json` file** – a serialized neural network model trained on the given dataset. The model is ready for immediate inference without the need for retraining.
+- **`dataset.csv`** *(or other format)* – the dataset used for training the model.
+- **`loss_plot.png`** – a visualization of the loss function value over the training epochs.
+
+### ✅ Recommended Workflow
+
+1. Create a new C# project in Visual Studio.
+2. Load the **MDNN.dll** library and add the necessary references.
+3. Copy the code from `program.txt` into the `Program.cs` file.
+4. Make sure the dataset is placed in the correct project directory if needed.
+5. Run the application.
+
+This way, you can easily test and modify different usage scenarios of the **MDNN** library according to your needs.
+
+### 🔧 Building the ready-made project
+
+The `MDNN_example` project references the library by **relative path** and assumes that
+`MDNN` and `MDNN_examples` are cloned **next to each other**:
 
 ```
 your-folder/
@@ -20,30 +36,12 @@ your-folder/
  └── MDNN_examples   <- this repository
 ```
 
-With that layout:
-
 ```bash
-git clone https://github.com/SilM4r/MDNN.git
-git clone https://github.com/SilM4r/MDNN_examples.git
-
 cd MDNN_examples/MDNN_example/MDNN_example
 dotnet run
 ```
 
-If you keep the library somewhere else, edit the `ProjectReference` in the `.csproj`, or
-replace it with a `Reference` + `HintPath` pointing at your own `MDNN.dll`.
+If you keep the library elsewhere, edit the `ProjectReference` in the `.csproj`, or replace it
+with a `Reference` + `HintPath` pointing at your own `MDNN.dll`.
 
-### ✅ Using an example in your own project
-
-1. Create a new C# project (.NET 9).
-2. Reference `MDNN.dll`, or add a `ProjectReference` to `MDNN.csproj`.
-3. Copy the contents of the example's `Program.cs` into your own `Program.cs`.
-4. If the example needs a dataset, place it where the code expects it.
-5. Run.
-
-### 📝 Notes
-
-- Training writes `loss.png` (the loss curve) and, when auto-save is on, `AutoSave.json`
-  (the best model so far) into the working directory. Both are ignored by git.
-- A saved model can be loaded with `MDNN.LoadModel(path)` and used for inference without
-  retraining.
+Training writes `loss.png` and, with auto-save on, `AutoSave.json` into the working directory.

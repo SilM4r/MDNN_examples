@@ -102,15 +102,43 @@ namespace My_DNN
                 }
             }
 
-            MDNN model = new MDNN(new Dense(1, new ReLu()), new Adam(0.001), new MSE());
+            // NORMALIZACE — bez ní se model nenaučí vůbec nic. Slova jsou zakódovaná čísly
+            // do ~77, takže MSE počítá s chybami v řádu tisíců a výstupní ReLu se zasekne
+            // v nule (loss se pak ani nehne: zůstane přesně na 1547,72). Po vydělení
+            // maximem, tedy do <0,1>, se to učí normálně.
+            double maxCode = 0;
+            foreach (double[] sequence in dataX)
+            {
+                foreach (double value in sequence)
+                {
+                    maxCode = Math.Max(maxCode, value);
+                }
+            }
+
+            for (int i = 0; i < dataX.Length; i++)
+            {
+                for (int j = 0; j < dataX[i].Length; j++)
+                {
+                    dataX[i][j] /= maxCode;
+                    dataY[i][j] /= maxCode;
+                }
+            }
+
+            // seed = reprodukovatelnost
+            MDNN model = new MDNN(new Dense(1, new ReLu()), new Adam(0.001), new MSE(), seed: 42);
 
             model.Layers.Add(new Dense(2));
 
-            Tensor inputT = new Tensor(Tensor.ConvertJaggedToMulti(dataX));
-            Tensor outputT = new Tensor(Tensor.ConvertJaggedToMulti(dataY));
-            model.Train.Number_Of_Show_Epoch_In_Console = 120;
+            model.Train.NumberOfShowEpochInConsole = 120;
 
-            model.Train.TrainLoop(inputT, outputT, 500000, 32, true);
+            // TrainLoop bere pole, ne Tensor — Tensor přetížení neexistuje.
+            //
+            // POZOR na význam epoch: epocha = jeden PLNÝ průchod trénovacím setem, ne jeden
+            // krok optimizeru. Původních 500 000 "epoch" byl počet kroků; kolik z toho vyjde
+            // epoch, záleží na velikosti datasetu a dávky (tady dávka 32).
+            model.Train.TrainLoop(dataX, dataY, 2000, 32, true);
+
+            Console.WriteLine($"Hotovo: {model.Train.CurrentEpoch} epoch, {model.Train.OptimizerSteps} kroků optimizeru.");
 
         }
 

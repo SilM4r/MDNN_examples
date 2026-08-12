@@ -89,15 +89,20 @@ namespace My_DNN
                 dataY.Add(curretOutput);
             }
 
-            MDNN model = new MDNN(new Dense(2, new Softmax()), new Adam(0.0001), new CrossEntropy());
+            // seed = reprodukovatelnost (stejný běh dvakrát dá stejný výsledek)
+            MDNN model = new MDNN(new Dense(2, new Softmax()), new Adam(0.0001), new CrossEntropy(), seed: 42);
 
             model.Layers.Add(new Dense(76));
 
+            // TrainLoop bere pole (double[][]), ne Tensor — Tensor přetížení neexistuje.
+            //
+            // POZOR na význam epoch: epocha = jeden PLNÝ průchod trénovacím setem, ne jeden
+            // krok optimizeru. Z 569 vzorků jde ~398 na trénink, což je při dávce 8 zhruba
+            // 50 kroků na epochu. Dřívějších 50 000 "epoch" (= 50 000 kroků) tedy odpovídá
+            // zhruba 1000 dnešním epochám.
+            model.Train.TrainLoop(dataX.ToArray(), dataY.ToArray(), 1000, 8);
 
-            Tensor inputT = new Tensor(Tensor.ConvertJaggedToMulti(dataX.ToArray()));
-            Tensor outputT = new Tensor(Tensor.ConvertJaggedToMulti(dataY.ToArray()));
-
-            model.Train.TrainLoop(inputT, outputT, 50_000, 8);
+            Console.WriteLine($"Hotovo: {model.Train.CurrentEpoch} epoch, {model.Train.OptimizerSteps} kroků optimizeru.");
 
         }
 

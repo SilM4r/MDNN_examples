@@ -64,25 +64,68 @@ namespace My_DNN
             //MDNN model = MDNN.LoadModel("AutoSave.json");
 
 
-            //GeneralNeuralNetworkSettings.calculationViaGpu = true;
+            //model.Context.CalculationViaGpu = true;
+
+            // NORMALIZACE — bez ní se tenhle příklad nenaučí vůbec nic.
+            // Fibonacciho hodnoty jdou do 4181, takže MSE počítá s chybami v řádu tisíců
+            // a gradienty utečou. Původní verze to řešila hrubou silou (2 260 000 epoch)
+            // a stejně skončila s loss ~15 000. Po vydělení maximem (hodnoty do <0,1>)
+            // spadne loss na ~0,0006 za pár set epoch.
+            double maxValue = 0;
+            foreach (double[][] sequence in data)
+            {
+                foreach (double[] step in sequence)
+                {
+                    foreach (double value in step)
+                    {
+                        maxValue = Math.Max(maxValue, value);
+                    }
+                }
+            }
+
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    for (int k = 0; k < dataX[i][j].Length; k++)
+                    {
+                        dataX[i][j][k] /= maxValue;
+                        dataY[i][j][k] /= maxValue;
+                    }
+                }
+            }
 
             Console.WriteLine("Convert data to dataset and splitting to input and target output data... done");
             Console.WriteLine("Creating model...");
 
             Layer outputLayer = new RNN(1, new ReLu());
 
-            MDNN model = new MDNN(outputLayer, new Adam(0.00001), new MSE());
+            // seed = reprodukovatelnost
+            // learning rate 0.005 (ne 0.00001) — po normalizaci dat je 1e-5 zbytečně opatrné
+            MDNN model = new MDNN(outputLayer, new Adam(0.005), new MSE(), seed: 42);
 
             model.info();
 
-            model.Train.Number_of_skip_frist_Epoch_in_plotter = 0;
-            model.Train.Number_Of_Show_Epoch_In_Console = 100;
+            model.Train.NumberOfSkipFristEpochInPlotter = 0;
+            model.Train.NumberOfShowEpochInConsole = 100;
 
             Console.WriteLine("Creating model... done");
             Console.WriteLine("Train... ");
 
             //model.Train.TestNeuralNetwork(dataX.ToArray(), dataY.ToArray());
-            model.Train.TrainLoop(new Tensor(Tensor.ConvertJaggedToMulti(dataX)), new Tensor(Tensor.ConvertJaggedToMulti(dataY)), 2260000, 1, false);
+            // Dvě opravy proti původní verzi:
+            //  1) TrainLoop bere pole, ne Tensor — Tensor přetížení neexistuje.
+            //  2) isSequence: true. Původně tu bylo false, nejspíš proto, že sekvenční
+            //     režim tehdy ještě pořádně nefungoval. Data jsou [7 sekvencí][4 kroky][1],
+            //     RNN se má učit krok po kroku a nést si skrytý stav — s false by se každá
+            //     sekvence tvářila jako jeden plochý vzorek o 4 hodnotách.
+            //
+            // POZOR na význam epoch: epocha = jeden PLNÝ průchod trénovacím setem, ne jeden
+            // krok optimizeru. Ze 7 sekvencí jdou 4 na trénink, takže při dávce 1 jsou to
+            // 4 kroky na epochu. Původních 2 260 000 "epoch" by dnes byla víc než půlmilionová
+            // hodnota. Po normalizaci dat stačí 2000 epoch (= 8000 kroků), loss klesne
+            // na ~0,0006 a síť předpovídá další člen posloupnosti správně.
+            model.Train.TrainLoop(dataX, dataY, 2000, 1, true);
 
             Console.WriteLine("Train... done ");
 

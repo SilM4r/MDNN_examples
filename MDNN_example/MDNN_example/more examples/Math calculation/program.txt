@@ -1,10 +1,8 @@
-using Microsoft.VisualBasic.FileIO;
 using My_DNN.Activation_functions;
 using My_DNN.Layers;
 using My_DNN.Loss_functions;
 using My_DNN.Optimizers;
 using System;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace My_DNN
@@ -17,18 +15,19 @@ namespace My_DNN
             int size_of_mini_batch = 5;
             int maxValue = 10;
 
-            Random rnd = new Random();
+            Random rnd = new Random(42);
 
-            //GeneralNeuralNetworkSettings.calculationViaGpu = true;
+            //model.Context.CalculationViaGpu = true;
 
-            MDNN model = new MDNN(new Dense(1, new Linear()), new Adam(0.001), new MSE());
+            // seed = reprodukovatelnost
+            MDNN model = new MDNN(new Dense(1, new Linear()), new Adam(0.001), new MSE(), seed: 42);
             model.Layers.Add(new Dense(32, new Leak_ReLu()));
             model.Layers.Add(new Dense(32, new Leak_ReLu()));
             model.Layers.Add(new Dense(32, new Leak_ReLu()));
             model.Layers.Add(new Dense(32, new Leak_ReLu()));
 
-            model.Train.Total_epoch = (uint)totalEpoch;
-            model.Train.Mini_batch = (uint)size_of_mini_batch;
+            model.Train.TotalEpoch = (uint)totalEpoch;
+            model.Train.MiniBatch = (uint)size_of_mini_batch;
 
 
             model.info();
@@ -45,16 +44,20 @@ namespace My_DNN
 
                 model.Train.UpdateParams();
 
-                if (epoch % 100 == 0)
+                if (epoch % 1000 == 0)
                 {
-                    double loss = GeneralNeuralNetworkSettings.loss_func.GetAverageLossPerIteration();
-                    if (loss is double.NaN || loss is double.PositiveInfinity)
+                    // loss se bere z modelu (model.Loss), ne z globálního nastavení —
+                    // od zavedení NetworkContextu má každý model tu svou.
+                    double loss = model.Loss.GetAverageLossPerIteration();
+                    if (!double.IsFinite(loss))
                     {
                         Console.WriteLine("Error: Nan number or infinity number");
                         return;
                     }
 
-                    ConsoleControler.ShowEpochInfo(model);
+                    // Ruční smyčka žádné epochy nemá, takže CurrentEpoch zůstane 0 —
+                    // smysl dává počítadlo kroků optimizeru.
+                    Console.WriteLine($"krok {model.Train.OptimizerSteps,7} / {totalEpoch}   loss {loss:F5}");
                 }
             }
 
@@ -63,10 +66,20 @@ namespace My_DNN
 
             model.SaveAsJson("computinTest");
 
-            while (true)
+            // Interaktivní vyzkoušení. Přeskočí se, když vstup není terminál (např. při
+            // spuštění ze skriptu) — jinak by se program zasekl na čekání na vstup.
+            while (!Console.IsInputRedirected)
             {
-                int num1 = int.Parse(Console.ReadLine());
-                int num2 = int.Parse(Console.ReadLine());
+                Console.Write("první číslo (prázdné = konec): ");
+                string? first = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(first)) break;
+
+                Console.Write("druhé číslo: ");
+                string? second = Console.ReadLine();
+                if (string.IsNullOrWhiteSpace(second)) break;
+
+                int num1 = int.Parse(first);
+                int num2 = int.Parse(second);
                 Console.WriteLine(model.GetResults(new Tensor(new double[] { num1, num2 })).Data[0]);
             }
 
