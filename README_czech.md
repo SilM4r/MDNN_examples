@@ -44,4 +44,5 @@ dotnet run
 Když máš knihovnu jinde, uprav `ProjectReference` v `.csproj`, nebo ho nahraď `Reference`
 + `HintPath` na svoji `MDNN.dll`.
 
-Trénink zapisuje do pracovního adresáře `loss.png` a při zapnutém auto-save i `AutoSave.json`.
+Při zapnutém auto-save zapisuje trénink do pracovního adresáře `AutoSave.json`. Graf loss (`loss.png`)
+potřebuje samostatnou knihovnu `MDNN.Plotting`: přidejte na ni referenci a zavolejte `model.Train.UseLossChart()`.

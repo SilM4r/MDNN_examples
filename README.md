@@ -44,4 +44,5 @@ dotnet run
 If you keep the library elsewhere, edit the `ProjectReference` in the `.csproj`, or replace it
 with a `Reference` + `HintPath` pointing at your own `MDNN.dll`.
 
-Training writes `loss.png` and, with auto-save on, `AutoSave.json` into the working directory.
+With auto-save on, training writes `AutoSave.json` into the working directory. A loss chart (`loss.png`)
+needs the separate `MDNN.Plotting` library: reference it and call `model.Train.UseLossChart()`.

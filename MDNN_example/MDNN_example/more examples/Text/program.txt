@@ -2,7 +2,6 @@ using My_DNN.Activation_functions;
 using My_DNN.Layers;
 using My_DNN.Loss_functions;
 using My_DNN.Optimizers;
-using ScottPlot.MultiplotLayouts;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
