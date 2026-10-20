@@ -17,8 +17,6 @@ namespace MDNN
 
             Random rnd = new Random(42);
 
-            //model.Context.CalculationViaGpu = true;
-
             // seed = reprodukovatelnost
             NeuralNetwork model = new NeuralNetwork(new Dense(1, new Linear()), new Adam(0.001), new MSE(), seed: 42);
             model.Layers.Add(new Dense(32, new LeakyReLU()));

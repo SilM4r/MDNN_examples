@@ -200,8 +200,6 @@ namespace MDNN
             //MDNN model = MDNN.LoadModel("AutoSave.json");
 
 
-            //model.Context.CalculationViaGpu = true;
-
             Console.WriteLine("Convert data to dataset and spliting to input and target output data... done");
             Console.WriteLine("Creating model...");
 

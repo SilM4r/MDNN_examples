@@ -63,8 +63,6 @@ namespace MDNN
             //MDNN model = MDNN.LoadModel("AutoSave.json");
 
 
-            //model.Context.CalculationViaGpu = true;
-
             // NORMALIZACE — bez ní se tenhle příklad nenaučí vůbec nic.
             // Fibonacciho hodnoty jdou do 4181, takže MSE počítá s chybami v řádu tisíců
             // a gradienty utečou. Původní verze to řešila hrubou silou (2 260 000 epoch)
