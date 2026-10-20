@@ -1,11 +1,11 @@
 using Microsoft.VisualBasic.FileIO;
-using My_DNN.Activation_functions;
-using My_DNN.Layers;
-using My_DNN.Loss_functions;
-using My_DNN.Optimizers;
+using MDNN.Activations;
+using MDNN.Layers;
+using MDNN.Losses;
+using MDNN.Optimizers;
 
 
-namespace My_DNN
+namespace MDNN
 {
     internal class Program
     {
@@ -90,7 +90,7 @@ namespace My_DNN
             }
 
             // seed = reprodukovatelnost (stejný běh dvakrát dá stejný výsledek)
-            MDNN model = new MDNN(new Dense(2, new Softmax()), new Adam(0.0001), new CrossEntropy(), seed: 42);
+            NeuralNetwork model = new NeuralNetwork(new Dense(2, new Softmax()), new Adam(0.0001), new CrossEntropy(), seed: 42);
 
             model.Layers.Add(new Dense(76));
 

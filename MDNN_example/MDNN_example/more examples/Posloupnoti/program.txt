@@ -1,12 +1,11 @@
 using Microsoft.VisualBasic.FileIO;
-using My_DNN.Activation_functions;
-using My_DNN.Layers;
-using My_DNN.Layers.classes;
-using My_DNN.Loss_functions;
-using My_DNN.Optimizers;
+using MDNN.Activations;
+using MDNN.Layers;
+using MDNN.Losses;
+using MDNN.Optimizers;
 
 
-namespace My_DNN
+namespace MDNN
 {
     internal class Program
     {
@@ -98,21 +97,21 @@ namespace My_DNN
             Console.WriteLine("Convert data to dataset and splitting to input and target output data... done");
             Console.WriteLine("Creating model...");
 
-            Layer outputLayer = new RNN(1, new ReLu());
+            Layer outputLayer = new RNN(1, new ReLU());
 
             // seed = reprodukovatelnost
             // learning rate 0.005 (ne 0.00001) — po normalizaci dat je 1e-5 zbytečně opatrné
-            MDNN model = new MDNN(outputLayer, new Adam(0.005), new MSE(), seed: 42);
+            NeuralNetwork model = new NeuralNetwork(outputLayer, new Adam(0.005), new MSE(), seed: 42);
 
-            model.info();
+            model.Info();
 
-            model.Train.NumberOfSkipFristEpochInPlotter = 0;
-            model.Train.NumberOfShowEpochInConsole = 100;
+            model.Train.LossChartSkipFirstReports = 0;
+            model.Train.ConsoleReportCount = 100;
 
             Console.WriteLine("Creating model... done");
             Console.WriteLine("Train... ");
 
-            //model.Train.TestNeuralNetwork(dataX.ToArray(), dataY.ToArray());
+            //model.Train.Evaluate(dataX.ToArray(), dataY.ToArray());
             // Dvě opravy proti původní verzi:
             //  1) TrainLoop bere pole, ne Tensor — Tensor přetížení neexistuje.
             //  2) isSequence: true. Původně tu bylo false, nejspíš proto, že sekvenční

@@ -1,9 +1,8 @@
-﻿using My_DNN;
-using My_DNN.Activation_functions;
-using My_DNN.Layers;
-using My_DNN.Layers.classes;
-using My_DNN.Loss_functions;
-using My_DNN.Optimizers;
+﻿using MDNN;
+using MDNN.Activations;
+using MDNN.Layers;
+using MDNN.Losses;
+using MDNN.Optimizers;
 
 namespace MDNN_example
 {
@@ -42,7 +41,7 @@ namespace MDNN_example
             uint epoch = 1000;
 
             // seed = reprodukovatelnost: stejný běh dvakrát dá stejný výsledek
-            MDNN model = new MDNN(outputLayer, optimizer, loss, seed: 42);
+            NeuralNetwork model = new NeuralNetwork(outputLayer, optimizer, loss, seed: 42);
 
             // TrainLoop si dataset sám zamíchá a rozdělí na train / valid / test
             // v poměru 0.7 / 0.15 / 0.15.

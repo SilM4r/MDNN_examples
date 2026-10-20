@@ -1,11 +1,11 @@
-using My_DNN.Activation_functions;
-using My_DNN.Layers;
-using My_DNN.Loss_functions;
-using My_DNN.Optimizers;
+using MDNN.Activations;
+using MDNN.Layers;
+using MDNN.Losses;
+using MDNN.Optimizers;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
-namespace My_DNN
+namespace MDNN
 {
     internal class Program
     {
@@ -102,7 +102,7 @@ namespace My_DNN
             }
 
             // NORMALIZACE — bez ní se model nenaučí vůbec nic. Slova jsou zakódovaná čísly
-            // do ~77, takže MSE počítá s chybami v řádu tisíců a výstupní ReLu se zasekne
+            // do ~77, takže MSE počítá s chybami v řádu tisíců a výstupní ReLU se zasekne
             // v nule (loss se pak ani nehne: zůstane přesně na 1547,72). Po vydělení
             // maximem, tedy do <0,1>, se to učí normálně.
             double maxCode = 0;
@@ -124,11 +124,11 @@ namespace My_DNN
             }
 
             // seed = reprodukovatelnost
-            MDNN model = new MDNN(new Dense(1, new ReLu()), new Adam(0.001), new MSE(), seed: 42);
+            NeuralNetwork model = new NeuralNetwork(new Dense(1, new ReLU()), new Adam(0.001), new MSE(), seed: 42);
 
             model.Layers.Add(new Dense(2));
 
-            model.Train.NumberOfShowEpochInConsole = 120;
+            model.Train.ConsoleReportCount = 120;
 
             // TrainLoop bere pole, ne Tensor — Tensor přetížení neexistuje.
             //

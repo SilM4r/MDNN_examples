@@ -1,10 +1,10 @@
 using Microsoft.VisualBasic.FileIO;
-using My_DNN.Activation_functions;
-using My_DNN.Layers;
-using My_DNN.Loss_functions;
-using My_DNN.Optimizers;
+using MDNN.Activations;
+using MDNN.Layers;
+using MDNN.Losses;
+using MDNN.Optimizers;
 
-namespace My_DNN
+namespace MDNN
 {
     internal class Program
     {
@@ -72,10 +72,10 @@ namespace My_DNN
             // Softmax + CrossEntropy je pro klasifikaci do více tříd správná dvojice:
             // knihovna je uvnitř spojí do jednoho kroku (gradient vyjde rovnou s - t).
             // seed = reprodukovatelnost
-            MDNN model = new MDNN(new Dense(3, new Softmax()), new Adam(0.01), new CrossEntropy(), seed: 42);
-            model.Layers.Add(new Dense(16, new Leak_ReLu()));
+            NeuralNetwork model = new NeuralNetwork(new Dense(3, new Softmax()), new Adam(0.01), new CrossEntropy(), seed: 42);
+            model.Layers.Add(new Dense(16, new LeakyReLU()));
 
-            model.info();
+            model.Info();
 
             // Epocha = jeden PLNÝ průchod trénovacím setem, ne jeden krok optimizeru.
             // Ze 150 vzorků jde 105 na trénink, takže při dávce 8 je to 14 kroků na epochu.

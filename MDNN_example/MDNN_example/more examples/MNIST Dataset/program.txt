@@ -1,12 +1,11 @@
 using Microsoft.VisualBasic.FileIO;
-using My_DNN.Activation_functions;
-using My_DNN.Layers;
-using My_DNN.Layers.classes;
-using My_DNN.Loss_functions;
-using My_DNN.Optimizers;
+using MDNN.Activations;
+using MDNN.Layers;
+using MDNN.Losses;
+using MDNN.Optimizers;
 
 
-namespace My_DNN
+namespace MDNN
 {
     internal class Program
     {
@@ -209,20 +208,20 @@ namespace My_DNN
             Layer outputLayer = new Dense(10, new Softmax());
 
             // seed = reprodukovatelnost
-            MDNN model = new MDNN(outputLayer, new Adam(0.0001), new CrossEntropy(), seed: 42);
-            model.Layers.Add(new Dense(32, new Leak_ReLu()));
+            NeuralNetwork model = new NeuralNetwork(outputLayer, new Adam(0.0001), new CrossEntropy(), seed: 42);
+            model.Layers.Add(new Dense(32, new LeakyReLU()));
 
-            model.info();
+            model.Info();
 
 
 
-            model.Train.NumberOfSkipFristEpochInPlotter = 0;
-            model.Train.NumberOfShowEpochInConsole = 30;
+            model.Train.LossChartSkipFirstReports = 0;
+            model.Train.ConsoleReportCount = 30;
 
             Console.WriteLine("Creating model... done");
             Console.WriteLine("Train... ");
 
-            //model.Train.TestNeuralNetwork(dataX.ToArray(), dataY.ToArray());
+            //model.Train.Evaluate(dataX.ToArray(), dataY.ToArray());
             // Synchronní TrainLoop, ne TrainLoopAsync: async cesta paralelizuje jednotlivé
             // neurony přes Task.Run, což je u malých vrstev dražší než sekvenční smyčka
             // (a v roadmapě knihovny je vedená k nahrazení data-paralelním minibatchem).

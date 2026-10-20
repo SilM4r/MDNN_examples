@@ -1,11 +1,11 @@
-using My_DNN.Activation_functions;
-using My_DNN.Layers;
-using My_DNN.Loss_functions;
-using My_DNN.Optimizers;
+using MDNN.Activations;
+using MDNN.Layers;
+using MDNN.Losses;
+using MDNN.Optimizers;
 using System;
 
 
-namespace My_DNN
+namespace MDNN
 {
     internal class Program
     {
@@ -20,17 +20,14 @@ namespace My_DNN
             //model.Context.CalculationViaGpu = true;
 
             // seed = reprodukovatelnost
-            MDNN model = new MDNN(new Dense(1, new Linear()), new Adam(0.001), new MSE(), seed: 42);
-            model.Layers.Add(new Dense(32, new Leak_ReLu()));
-            model.Layers.Add(new Dense(32, new Leak_ReLu()));
-            model.Layers.Add(new Dense(32, new Leak_ReLu()));
-            model.Layers.Add(new Dense(32, new Leak_ReLu()));
-
-            model.Train.TotalEpoch = (uint)totalEpoch;
-            model.Train.MiniBatch = (uint)size_of_mini_batch;
+            NeuralNetwork model = new NeuralNetwork(new Dense(1, new Linear()), new Adam(0.001), new MSE(), seed: 42);
+            model.Layers.Add(new Dense(32, new LeakyReLU()));
+            model.Layers.Add(new Dense(32, new LeakyReLU()));
+            model.Layers.Add(new Dense(32, new LeakyReLU()));
+            model.Layers.Add(new Dense(32, new LeakyReLU()));
 
 
-            model.info();
+            model.Info();
 
             for (int epoch = 0; epoch < totalEpoch; epoch++)
             {
@@ -83,7 +80,7 @@ namespace My_DNN
                 Console.WriteLine(model.GetResults(new Tensor(new double[] { num1, num2 })).Data[0]);
             }
 
-            int control(MDNN model)
+            int control(NeuralNetwork model)
             {
                 int score = 0;
 
